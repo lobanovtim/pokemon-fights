@@ -4,6 +4,7 @@ function getElById(id) {
 
 const $btnKick = getElById('btn-kick');
 const $btnPush = getElById('btn-push');
+const $btns = document.querySelectorAll('.button');
 const $logs = document.querySelector('#logs')
 
 function random(num) {
@@ -16,42 +17,62 @@ const character = {
     damageHP: 100,
     elHP: getElById('health-character'),
     elProgressbar: getElById('progressbar-character'),
-    changeHP: changeHP,
-    renderHP: renderHP,
-    renderHPLife: renderHPLife,
-    renderProgressBarHP: renderProgressBarHP,
+    changeHP,
+    renderHP,
+    renderHPLife,
+    renderProgressBarHP,
+    lastDamageHP: 0,
 
 }
 
 const enemy = {
     name: 'Character',
-    defulHP: 200,
+    defulHP: 100,
     damageHP: 100,
     elHP: getElById('health-enemy'),
     elProgressbar: getElById('progressbar-enemy'),
-    changeHP: changeHP,
-    renderHP: renderHP,
-    renderHPLife: renderHPLife,
-    renderProgressBarHP: renderProgressBarHP,
+    changeHP,
+    renderHP,
+    renderHPLife,
+    renderProgressBarHP,
+    lastDamageHP: 0,
 }
 
-let characterDamageHP = 0;
-let enemyDamageHP = 0;
+const amountKick = new counter();
+const amountPush = new counter();;
+const maxKicks = 6;
 
-const {name: nameCharacter} = character;
-const {name: nameEnemy} = enemy;
-
+function counter() {
+    this.count = 0;
+    this.addCount = function() {
+        this.count += 1;
+    }
+}
+$btnKick.textContent = `Thunder Jolt [${maxKicks} из ${maxKicks}] ударов`;
 $btnKick.addEventListener('click', function() {
     console.log(`Kick`);
     characterDamageHP = character.changeHP(random(20));
     enemyDamageHP = enemy.changeHP(random(20));
+    amountKick.addCount();
+    this.textContent = ``;
+    this.textContent = `Thunder Jolt [${maxKicks - amountKick.count} из ${maxKicks} ударов]`;
+    if (maxKicks <= amountKick.count) {
+        $btnKick.disabled = true;
+    }
+  
 });
 
+$btnPush.textContent = `Tail Kick [${maxKicks} из ${maxKicks}] ударов`;
 $btnPush.addEventListener('click', function() {
     console.log(`Push`);
     characterDamageHP = character.changeHP(random(10));
     enemyDamageHP = enemy.changeHP(random(10));
-});
+    amountPush.addCount();
+    this.textContent = ``;
+    this.textContent = `Tail Kick [${maxKicks - amountPush.count} из ${maxKicks} ударов]`;
+    if (maxKicks <= amountPush.count) {
+        $btnPush.disabled = true;
+    }});
 
 function init() {
     console.log('Start Game!');
@@ -74,8 +95,9 @@ function renderProgressBarHP() {
 
 function changeHP(count, person) {
     this.damageHP -= count;
+    this.lastDamageHP = count;
 
-    const log = this === enemy ? generateLog(this, character) : generateLog(enemy, this);
+    const log = this === enemy ? generateLog(enemy, character) : generateLog(character, enemy);
     const $p = document.createElement('p');
     
     $p.innerText = `${log}`;  
@@ -88,31 +110,36 @@ function changeHP(count, person) {
         $btnKick.disabled = true;
         $btnPush.disabled = true;
     }
+
+    if (this.damageHP === count) {
+        $p.innerText = `Бой был равный! Ничья.`
+    }
     
     this.renderHP();
-            
 }
 
-function generateLog(firstPerson, secondPerson) {
+function generateLog(toPerson, fromPerson) {
     const logs = [
-        // Хотел использовать переменную-счётчик, но так и не понял, почему она не перезаписывается
-        // Как пользоваться this в данном контексте? Ведь this.changeHP должен вызывать метод объекта в контексте
-        `${nameCharacter} вспомнил что-то важное, но неожиданно ${nameEnemy}, не помня себя от испуга, ударил в предплечье враг -${characterDamageHP}HP[${character.damageHP}/${character.defulHP}]`, 
-        `${nameCharacter} поперхнулся, и за это ${nameEnemy} с испугу приложил прямой удар коленом в лоб врага.`,
-        `${nameCharacter} забылся, но в это время наглый ${nameEnemy}, приняв волевое решение, неслышно подойдя сзади, ударил.`,
-        `${nameCharacter} пришел в себя, но неожиданно ${nameEnemy} случайно нанес мощнейший удар.`,
-        `${nameCharacter} поперхнулся, но в это время ${nameEnemy} нехотя раздробил кулаком \<вырезанно цензурой\> противника.`,
-        `${nameCharacter} удивился, а ${nameEnemy} пошатнувшись влепил подлый удар.`,
-        `${nameCharacter} высморкался, но неожиданно ${nameEnemy} провел дробящий удар.`,
-        `${nameCharacter} пошатнулся, и внезапно наглый ${nameEnemy} беспричинно ударил в ногу противника`,
-        `${nameCharacter} расстроился, как вдруг, неожиданно ${nameEnemy} случайно влепил стопой в живот соперника.`,
-        `${nameCharacter} пытался что-то сказать, но вдруг, неожиданно ${nameEnemy} со скуки, разбил бровь сопернику`
+        `${toPerson.name} вспомнил что-то важное, но неожиданно ${fromPerson.name}, не помня себя от испуга, ударил в предплечье враг. -${toPerson.lastDamageHP}HP[${character.damageHP}/${character.defulHP}]`, 
+        `${toPerson.name} поперхнулся, и за это ${fromPerson.name} с испугу приложил прямой удар коленом в лоб врага. -${toPerson.lastDamageHP}HP[${character.damageHP}/${character.defulHP}]`,
+        `${toPerson.name} забылся, но в это время наглый ${fromPerson.name}, приняв волевое решение, неслышно подойдя сзади, ударил. -${toPerson.lastDamageHP}HP[${character.damageHP}/${character.defulHP}]`,
+        `${toPerson.name} пришел в себя, но неожиданно ${fromPerson.name} случайно нанес мощнейший удар. -${toPerson.lastDamageHP}HP[${character.damageHP}/${character.defulHP}]`,
+        `${toPerson.name} поперхнулся, но в это время ${fromPerson.name} нехотя раздробил кулаком \<вырезанно цензурой\> противника. -${toPerson.lastDamageHP}HP[${character.damageHP}/${character.defulHP}]`,
+        `${toPerson.name} удивился, а ${fromPerson.name} пошатнувшись влепил подлый удар. -${toPerson.lastDamageHP}HP[${character.damageHP}/${character.defulHP}]`,
+        `${toPerson.name} высморкался, но неожиданно ${fromPerson.name} провел дробящий удар. -${toPerson.lastDamageHP}HP[${character.damageHP}/${character.defulHP}]`,
+        `${toPerson.name} пошатнулся, и внезапно наглый ${fromPerson.name} беспричинно ударил в ногу противника. -${toPerson.lastDamageHP}HP[${character.damageHP}/${character.defulHP}]`,
+        `${toPerson.name} расстроился, как вдруг, неожиданно ${fromPerson.name} случайно влепил стопой в живот соперника. -${toPerson.lastDamageHP}HP[${character.damageHP}/${character.defulHP}]`,
+        `${toPerson.name} пытался что-то сказать, но вдруг, неожиданно ${fromPerson.name} со скуки, разбил бровь сопернику. -${toPerson.lastDamageHP}HP[${character.damageHP}/${character.defulHP}]`
     ];
     
     return logs[random(logs.length) - 1];
 };
 
-
+for (let i = 0; i <= $btns.lenght; i++) {
+    $btns[i].addEventListener('click', function() {
+        console.log(`boom`);
+    });
+}
 
 
 init();
