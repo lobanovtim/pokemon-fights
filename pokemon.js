@@ -6,14 +6,17 @@ class Selectors {
 }
 
 class Pokemon extends Selectors {
-    constructor({name, defulHP, damageHP, type, selectors}) {
+    constructor({name, hp, type, selectors, attacks = []}) {
         super(selectors);
 
         this.name = name;
-        this.defulHP = defulHP;
-        this.damageHP = damageHP;
+        this.hp = {
+            current: hp,
+            total: hp,
+        };
         this.type = type;
         this.lastDamageHP;
+        this.attacks = attacks;
 
         this.renderHP();
     }
@@ -23,28 +26,38 @@ class Pokemon extends Selectors {
     }
     
     renderHPLife = () => {
-        const{ elHp, damageHP, defulHP} = this;
+        const { elHp, hp: {current, total} } = this;
 
-        elHp.innerText = damageHP + '/' + defulHP;
+        elHp.innerText = current + '/' + total;
     }
     
     renderProgressBarHP = () => {
-        this.elProgressbar.style.width = this.damageHP + '%';
+        const { elProgressbar, hp: {current, total} } = this;
+        const procent = current / (total / 100);
+        if (procent > 60) {
+            elProgressbar.classList.remove('low');
+            elProgressbar.classList.remove('critical');
+
+        }
+        if (procent <= 60 && procent >= 20) {
+            elProgressbar.classList.add('low');
+        }
+        if (procent < 20) {
+            elProgressbar.classList.add('critical');
+        }
+        elProgressbar.style.width = procent + '%';
     }
 
     changeHP = (count, cb) => {
+        this.hp.current -= count;
 
-        this.damageHP -= count;
-        this.lastDamageHP = count;
-
-        if (this.damageHP <= count) {
-            this.damageHP = 0;
+        if (this.hp.current <= count) {
+            this.hp.current = 0;
         }
 
         this.renderHP();
         cb && cb(count);
     }
-
 
 }
 

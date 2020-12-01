@@ -1,5 +1,6 @@
-function random(num) {
-    return Math.ceil(Math.random() * num);
+function random(min, max) {
+    let num = min + Math.random() * (max + 1 - min);
+    return Math.floor(num);
 }
 
 export default random;
