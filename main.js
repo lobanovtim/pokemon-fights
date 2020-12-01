@@ -6,17 +6,33 @@ import renderLog from "./renderLog.js";
 
 
 class Game {
+    constructor() {
+        // this.allButtons = document.querySelectorAll('.button');
+        // this.$btn = document.createElement('button');
+        // this.$control = document.querySelector('.control');
+    }
+    
     getPokemons = async () => {
         const responce = await fetch ('https://reactmarathon-api.netlify.app/api/pokemons');
         const body = await responce.json();
         return body;
     }
 
+    getRandomPokemon = async () => {
+        const responce = await fetch ('https://reactmarathon-api.netlify.app/api/pokemons?random=true');
+        const body = await responce.json();
+        return body;
+    }
+
+
     start = async () => {
+        const $btn = document.createElement('button');
+        const $control = document.querySelector('.control');
+        const allButtons = []
         const pokemons = await this.getPokemons();
         console.log(pokemons);
         const pikachu = pokemons.find(item => item.name === 'Pikachu')
-        let randomEnemy = pokemons[random(0, pokemons.length)];
+        let randomEnemy = await this.getRandomPokemon()
         
         let player1 = new Pokemon({
             ...pikachu,
@@ -35,10 +51,6 @@ class Game {
         
         const minDamage = [];
         const maxDamage = [];
-        let allButtons = [];
-
-        const $btn = document.createElement('button');
-        const $control = document.querySelector('.control');
 
         player1.attacks.forEach(item => {
             minDamage.push(item.minDamage)
@@ -57,9 +69,6 @@ class Game {
 
         buttonStart();
 
-        
-        
-        
         // Первый удар из списка соперника
         const firstKickEnemy = (player) => {
             const min = player.attacks[0].minDamage;
@@ -68,47 +77,13 @@ class Game {
         };
         
         
-        // const randomAttack = () => {
-        //     const attacks = [];
-        //     let newArr = []
-        //     allButtons.forEach(item => {
-        //         console.log(item.innerText);
-        //         console.log(player1.attacks.name);
-        //         if (item.innerText === player1.attacks.name) {
-        //             return(attacks.push(player1.attacks.maxDamage))
-        //         }
-        //     });
-        // }
-        
-            // for(let i = 0; i < minDamage.length; i++) {
-            //     newArr = [minDamage[i], maxDamage[i]];
-            //     attacks.push(newArr)
-            // }
-            // return(attacks);
-        
-        //    let i = random(0, minDamage.length);
-        //    console.log([minDamage[i], maxDamage[i]])
-        //    return([minDamage[i], maxDamage[i]])
-        
-        // console.log(randomAttack(minDamage, maxDamage));
-        // console.log(maxDamage[0])
-        
-        
         const renderChengeHP = () => {
             allButtons.forEach(item => {
                 item.addEventListener('click', function() {
-                    player1.changeHP(random(20, 40), function(count) {
-                        // console.log(randomAttack())
-                    renderLog(player1, count);
-                    });
-                    player2.changeHP(random(firstKickEnemy(player2)[0],firstKickEnemy(player2)[1]), function(count) {
-                        renderLog(player2, count);
-                    });
+          
                 });
             });
         };
-        
-        
         
         const renderEnemy = () => {
             const $elImg = document.getElementById('img-player2');
@@ -116,8 +91,7 @@ class Game {
             $elImg.src = randomEnemy.img;
             $elName.innerText = randomEnemy.name;
             }
-        
-        
+
         const renderButton = () => {
             player1.attacks.forEach(item => {
                 const $btn = document.createElement('button');
@@ -125,16 +99,22 @@ class Game {
                 $btn.innerText = item.name;
                 const btnCount = countBtn(item.maxCount, $btn);
                 $btn.addEventListener('click', () => {
-                    btnCount()
+                    btnCount();
+                    console.log(item.minDamage, item.maxDamage)
+                    player1.changeHP(random(item.minDamage, item.maxDamage), function(count) {
+                        // console.log(randomAttack())
+                    renderLog(player1, player2, count);
+                    });
+                    player2.changeHP(random(firstKickEnemy(player2)[0],firstKickEnemy(player2)[1]), function(count) {
+                        renderLog(player2, player1, count);
+                    });
                 })
-        
+
                 allButtons.push($control.appendChild($btn));
-                // console.log(allButtons);
+                console.log(allButtons);
             });
         };
-        
-        
-        
+
         function countBtn(count, el) {
             const innerText = el.innerText;
             el.innerText = `${innerText}(${count})`
@@ -164,20 +144,20 @@ class Game {
             randomEnemy = pokemons[random(0, pokemons.length)];
             renderEnemy();
             renderButton();
-            renderChengeHP();
         }
-        
-        
-        
-        const gameOver = () => {
-            let $btns = $btn;
-            $btns.remove();
-            $btn.classList.add('button');
-            $btn.innerText = `Game Over. Начать сначала?`;
-            $control.appendChild($btn).addEventListener('click', function() {
-                startGame();
-            });
-        }
+    }
+
+    gameOver = () => {
+        const $btn = document.createElement('button');
+        const $control = document.querySelector('.control');
+        $control.innerHTML = ``;
+        $btn.classList.add('button');
+        $btn.innerText = `Game Over. Начать сначала?`;
+        $control.appendChild($btn).addEventListener('click', () => {
+            $btn.remove();
+            this.start();
+
+        });
     }
 }
 
