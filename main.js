@@ -33,6 +33,7 @@ class Game {
         console.log(pokemons);
         const pikachu = pokemons.find(item => item.name === 'Pikachu')
         let randomEnemy = await this.getRandomPokemon()
+
         
         let player1 = new Pokemon({
             ...pikachu,
@@ -77,13 +78,13 @@ class Game {
         };
         
         
-        const renderChengeHP = () => {
-            allButtons.forEach(item => {
-                item.addEventListener('click', function() {
+        // const renderChengeHP = () => {
+        //     allButtons.forEach(item => {
+        //         item.addEventListener('click', function() {
           
-                });
-            });
-        };
+        //         });
+        //     });
+        // };
         
         const renderEnemy = () => {
             const $elImg = document.getElementById('img-player2');

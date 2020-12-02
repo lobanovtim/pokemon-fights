@@ -21,7 +21,7 @@ const clearLog = () => {
 
 
 const renderLog = (player1, player2, count) => {
-    // console.log(player);
+    console.log(count);
     let log = generateLog(player1, player2, count);
     logArr.push(log);
     const $p = document.createElement('p');
@@ -29,20 +29,22 @@ const renderLog = (player1, player2, count) => {
     $logs.insertBefore($p, $logs.children[0]);
     // console.log(logArr);
     if (player1.hp.current < count && player2.hp.current < count) {
+        player1.hp.current = 0;
+        player2.hp.current = 0;
         $p.innerText = `Бой был равный! Ничья.`
+        $logs.insertBefore($p, $logs.children[0]);
         deleteButton();
         game.gameOver();
     }
-    // if (player.hp.current <= count) {
-    //     player.hp.current = 0;
-    //     $p.innerText = `Бедный ${player.name} проиграл бой!`;
-    //     $logs.insertBefore($p, $logs.children[0]);
-    //     deleteButton();
-    //     gameOver();
-    //     // console.log(logArr);
-    //     // clearLog();
-    // }
-
+    if (player1.hp.current <= count) {
+        player1.hp.current = 0;
+        $p.innerText = `Бедный ${player1.name} проиграл бой!`;
+        $logs.insertBefore($p, $logs.children[0]);
+        deleteButton();
+        game.gameOver();
+        // console.log(logArr);
+        // clearLog();
+    }
 }
 
 function generateLog(player1, player2, count) {
@@ -51,7 +53,6 @@ function generateLog(player1, player2, count) {
     console.log(player1);
     console.log(player2);
     const { name: enemyName } = player2;
-
 
     const logs = [
         `${name} вспомнил что-то важное, но неожиданно ${enemyName}, не помня себя от испуга, ударил в предплечье враг. -${count}HP[${current}/${total}]`, 
@@ -66,7 +67,7 @@ function generateLog(player1, player2, count) {
         `${name} пытался что-то сказать, но вдруг, неожиданно ${enemyName} со скуки, разбил бровь сопернику. -${count}HP[${current}/${total}]`
     ];
     
-    return logs[random(0, logs.length)];
+    return logs[random(0, (logs.length - 1))];
 };
 
 export default renderLog;
