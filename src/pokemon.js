@@ -15,7 +15,6 @@ class Pokemon extends Selectors {
             total: hp,
         };
         this.type = type;
-        this.lastDamageHP;
         this.attacks = attacks;
 
         this.renderHP();
