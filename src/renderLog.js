@@ -4,7 +4,6 @@ import random from "./utils.js";
 const $logs = document.querySelector('#logs')
 const logArr = [];
 
-// console.log(game)
 const allButtons = document.querySelectorAll('.button')
 
 const deleteButton = () =>{
@@ -21,13 +20,21 @@ const clearLog = () => {
 
 
 const renderLog = (player1, player2, count) => {
-    console.log(count);
     let log = generateLog(player1, player2, count);
     logArr.push(log);
     const $p = document.createElement('p');
     $p.innerText = `${log}`;  
     $logs.insertBefore($p, $logs.children[0]);
-    // console.log(logArr);
+
+    console.log(logArr)
+    console.log(player1.hp.current, player2.hp.current, count)
+    if (player1.hp.current <= count) {
+        player1.hp.current = 0;
+        $p.innerText = `Бедный ${player1.name} проиграл бой!`;
+        $logs.insertBefore($p, $logs.children[0]);
+        deleteButton();
+        game.gameOver();
+    }
     if (player1.hp.current < count && player2.hp.current < count) {
         player1.hp.current = 0;
         player2.hp.current = 0;
@@ -36,22 +43,10 @@ const renderLog = (player1, player2, count) => {
         deleteButton();
         game.gameOver();
     }
-    if (player1.hp.current <= count) {
-        player1.hp.current = 0;
-        $p.innerText = `Бедный ${player1.name} проиграл бой!`;
-        $logs.insertBefore($p, $logs.children[0]);
-        deleteButton();
-        game.gameOver();
-        // console.log(logArr);
-        // clearLog();
-    }
 }
 
 function generateLog(player1, player2, count) {
-    console.log(player1)
     const { name, hp: {current, total} } = player1;
-    console.log(player1);
-    console.log(player2);
     const { name: enemyName } = player2;
 
     const logs = [
