@@ -26,8 +26,6 @@ const renderLog = (player1, player2, count) => {
     $p.innerText = `${log}`;  
     $logs.insertBefore($p, $logs.children[0]);
 
-    console.log(logArr)
-    console.log(player1.hp.current, player2.hp.current, count)
     if (player1.hp.current <= count) {
         player1.hp.current = 0;
         $p.innerText = `Бедный ${player1.name} проиграл бой!`;
