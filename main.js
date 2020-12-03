@@ -6,6 +6,12 @@ import renderLog from "./renderLog.js";
 
 
 class Game {
+    constructor() {
+        // this.allButtons = document.querySelectorAll('.button');
+        // this.$btn = document.createElement('button');
+        // this.$control = document.querySelector('.control');
+    }
+    
     getPokemons = async () => {
         const responce = await fetch ('https://reactmarathon-api.netlify.app/api/pokemons');
         const body = await responce.json();
@@ -18,23 +24,39 @@ class Game {
         return body;
     }
 
+
     start = async () => {
         const $btn = document.createElement('button');
         const $control = document.querySelector('.control');
         const allButtons = []
         const pokemons = await this.getPokemons();
+        console.log(pokemons);
         const pikachu = pokemons.find(item => item.name === 'Pikachu')
         let randomEnemy = await this.getRandomPokemon()
+
         
         let player1 = new Pokemon({
             ...pikachu,
             selectors: 'player1',
         });
 
+        console.log(player1);
+        
         let player2 = new Pokemon({
             ...randomEnemy,
             selectors: 'player2',
         });
+
+        console.log(player2);
+
+        
+        const minDamage = [];
+        const maxDamage = [];
+
+        player1.attacks.forEach(item => {
+            minDamage.push(item.minDamage)
+            maxDamage.push(item.maxDamage)
+        }) 
 
         const buttonStart = () => {
             let $btns = $btn;
@@ -46,6 +68,24 @@ class Game {
             });
         };
 
+        buttonStart();
+
+        // Первый удар из списка соперника
+        const firstKickEnemy = (player) => {
+            const min = player.attacks[0].minDamage;
+            const max = player.attacks[0].maxDamage;
+            return([min, max]);
+        };
+        
+        
+        // const renderChengeHP = () => {
+        //     allButtons.forEach(item => {
+        //         item.addEventListener('click', function() {
+          
+        //         });
+        //     });
+        // };
+        
         const renderEnemy = () => {
             const $elImg = document.getElementById('img-player2');
             const $elName = document.getElementById('name-player2');
@@ -61,15 +101,18 @@ class Game {
                 const btnCount = countBtn(item.maxCount, $btn);
                 $btn.addEventListener('click', () => {
                     btnCount();
+                    console.log(item.minDamage, item.maxDamage)
                     player1.changeHP(random(item.minDamage, item.maxDamage), function(count) {
-                        renderLog(player1, player2, count);
+                        // console.log(randomAttack())
+                    renderLog(player1, player2, count);
                     });
-                    player2.changeHP(random(item.minDamage, item.maxDamage), function(count) {
+                    player2.changeHP(random(firstKickEnemy(player2)[0],firstKickEnemy(player2)[1]), function(count) {
                         renderLog(player2, player1, count);
                     });
                 })
 
                 allButtons.push($control.appendChild($btn));
+                console.log(allButtons);
             });
         };
 
@@ -103,8 +146,6 @@ class Game {
             renderEnemy();
             renderButton();
         }
-
-        buttonStart();
     }
 
     gameOver = () => {
@@ -123,5 +164,6 @@ class Game {
 
 const game = new Game();
 game.start();
+console.log(game.player1);
 
 export default game;
