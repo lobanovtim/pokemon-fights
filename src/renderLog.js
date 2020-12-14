@@ -1,8 +1,7 @@
 import game from "./main.js";
 import random from "./utils.js";
 
-const $logs = document.querySelector('#logs')
-const logArr = [];
+let $logs = document.querySelector('#logs');
 
 const allButtons = document.querySelectorAll('.button')
 
@@ -12,36 +11,28 @@ const deleteButton = () =>{
     });
 }
 
-const clearLog = () => {
-    logArr.forEach(item => {
-        item.remove();
-    });
+const endGame = () => {
+    deleteButton();
+    game.gameOver();
 }
-
 
 const renderLog = (player1, player2, count) => {
     let log = generateLog(player1, player2, count);
-    logArr.push(log);
     const $p = document.createElement('p');
     $p.innerText = `${log}`;  
     $logs.insertBefore($p, $logs.children[0]);
-
-    console.log(logArr)
-    console.log(player1.hp.current, player2.hp.current, count)
-    if (player1.hp.current <= count) {
+    if (player1.hp.current <= 0) {
         player1.hp.current = 0;
         $p.innerText = `Бедный ${player1.name} проиграл бой!`;
         $logs.insertBefore($p, $logs.children[0]);
-        deleteButton();
-        game.gameOver();
+        endGame();
     }
-    if (player1.hp.current < count && player2.hp.current < count) {
+    if (player1.hp.current <= 0 && player2.hp.current <= 0) {
         player1.hp.current = 0;
         player2.hp.current = 0;
-        $p.innerText = `Бой был равный! Ничья.`
+        $p.innerText = `Постоооойте...за секунду до смерти ${player2.name} из последних сил нанес мощный ответный удар! Ничья.`
         $logs.insertBefore($p, $logs.children[0]);
-        deleteButton();
-        game.gameOver();
+        endGame();
     }
 }
 
@@ -61,7 +52,7 @@ function generateLog(player1, player2, count) {
         `${name} расстроился, как вдруг, неожиданно ${enemyName} случайно влепил стопой в живот соперника. -${count}HP[${current}/${total}]`,
         `${name} пытался что-то сказать, но вдруг, неожиданно ${enemyName} со скуки, разбил бровь сопернику. -${count}HP[${current}/${total}]`
     ];
-    
+
     return logs[random(0, (logs.length - 1))];
 };
 
