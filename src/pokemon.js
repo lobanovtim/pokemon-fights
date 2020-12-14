@@ -19,24 +19,23 @@ class Pokemon extends Selectors {
 
         this.renderHP();
     }
+
     renderHP = () => {
         this.renderHPLife();
         this.renderProgressBarHP();
     }
-    
+
     renderHPLife = () => {
         const { elHp, hp: {current, total} } = this;
-
         elHp.innerText = current + '/' + total;
     }
-    
+
     renderProgressBarHP = () => {
         const { elProgressbar, hp: {current, total} } = this;
         const procent = current / (total / 100);
         if (procent > 60) {
             elProgressbar.classList.remove('low');
             elProgressbar.classList.remove('critical');
-
         }
         if (procent <= 60 && procent >= 20) {
             elProgressbar.classList.add('low');

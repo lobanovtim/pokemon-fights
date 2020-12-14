@@ -4,7 +4,6 @@ import renderLog from "./renderLog.js";
 
 
 
-
 class Game {
     getPokemons = async () => {
         const responce = await fetch ('https://reactmarathon-api.netlify.app/api/pokemons');
@@ -21,13 +20,25 @@ class Game {
     start = async () => {
         const $btn = document.createElement('button');
         const $control = document.querySelector('.control');
-        const allButtons = []
         const pokemons = await this.getPokemons();
-        const pikachu = pokemons.find(item => item.name === 'Pikachu')
-        let randomEnemy = await this.getRandomPokemon()
+        const allButtons = [];
+        let randomHero = {};
+        let randomEnemy = {};
+        const findRivals = () => {
+            const player1 = pokemons[random(0, pokemons.length)];
+            const player2 = pokemons[random(0, pokemons.length)];
+            if (player1.name != player2.name) {
+                return(randomHero = player1, randomEnemy = player2);
+            }
+            else {
+                findRivals();
+            }
+        }
+
+        findRivals()
         
         let player1 = new Pokemon({
-            ...pikachu,
+            ...randomHero,
             selectors: 'player1',
         });
 
@@ -37,21 +48,29 @@ class Game {
         });
 
         const buttonStart = () => {
-            let $btns = $btn;
-            $btns.classList.add('button');
-            $btns.innerText = `Начинаем бой?`;
-            $control.appendChild($btns).addEventListener('click', function() {
-                $btns.remove();
-                startGame();
+            $btn.classList.add('button');
+            $btn.innerText = `Начинаем бой?`;
+            $control.appendChild($btn).addEventListener('click', function() {
+                $btn.remove();
+                renderEnemy1();
+                renderEnemy2();
+                renderButton();
             });
         };
 
-        const renderEnemy = () => {
+        const renderEnemy1 = () => {
+            const $elImg = document.getElementById('img-player1');
+            const $elName = document.getElementById('name-player1');
+            $elImg.src = randomHero.img;
+            $elName.innerText = randomHero.name;
+        }
+
+        const renderEnemy2 = () => {
             const $elImg = document.getElementById('img-player2');
             const $elName = document.getElementById('name-player2');
             $elImg.src = randomEnemy.img;
             $elName.innerText = randomEnemy.name;
-            }
+        }
 
         const renderButton = () => {
             player1.attacks.forEach(item => {
@@ -65,10 +84,9 @@ class Game {
                         renderLog(player1, player2, count);
                     });
                     player2.changeHP(random(item.minDamage, item.maxDamage), function(count) {
-                        renderLog(player2, player1, count);
+                            renderLog(player2, player1, count);
                     });
                 })
-
                 allButtons.push($control.appendChild($btn));
             });
         };
@@ -85,26 +103,23 @@ class Game {
                 return count;
             }
         }
-        
-        
+
         const startGame = () => {
             allButtons.forEach(item => {
                 item.remove();
             });
-                player1 = new Pokemon({
-                ...pikachu,
+            player1 = new Pokemon({
+                ...randomHero,
                 selectors: 'player1',
             });
             player2 = new Pokemon({
                 ...randomEnemy,
                 selectors: 'player2',
             });
-            randomEnemy = pokemons[random(0, pokemons.length)];
-            renderEnemy();
-            renderButton();
+            buttonStart();
         }
 
-        buttonStart();
+        startGame();
     }
 
     gameOver = () => {
@@ -114,9 +129,13 @@ class Game {
         $btn.classList.add('button');
         $btn.innerText = `Game Over. Начать сначала?`;
         $control.appendChild($btn).addEventListener('click', () => {
+            let $logs = document.querySelector('#logs');
+            let newLogs = $logs.querySelectorAll('p');
+            newLogs.forEach(item  => {
+                item.remove();
+            })
             $btn.remove();
             this.start();
-
         });
     }
 }
