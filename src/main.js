@@ -18,8 +18,8 @@ class Game {
     }
 
     start = async () => {
-        const $btn = document.createElement('button');
-        const $control = document.querySelector('.control');
+        const btn = document.createElement('button');
+        const control = document.querySelector('.control');
         const pokemons = await this.getPokemons();
         const allButtons = [];
         let randomHero = {};
@@ -48,10 +48,10 @@ class Game {
         });
 
         const buttonStart = () => {
-            $btn.classList.add('button');
-            $btn.innerText = `Начинаем бой?`;
-            $control.appendChild($btn).addEventListener('click', function() {
-                $btn.remove();
+            btn.classList.add('button');
+            btn.innerText = `Начинаем бой?`;
+            control.appendChild(btn).addEventListener('click', function() {
+                btn.remove();
                 renderEnemy1();
                 renderEnemy2();
                 renderButton();
@@ -59,26 +59,26 @@ class Game {
         };
 
         const renderEnemy1 = () => {
-            const $elImg = document.getElementById('img-player1');
-            const $elName = document.getElementById('name-player1');
-            $elImg.src = randomHero.img;
-            $elName.innerText = randomHero.name;
+            const elImg = document.getElementById('img-player1');
+            const elName = document.getElementById('name-player1');
+            elImg.src = randomHero.img;
+            elName.innerText = randomHero.name;
         }
 
         const renderEnemy2 = () => {
-            const $elImg = document.getElementById('img-player2');
-            const $elName = document.getElementById('name-player2');
-            $elImg.src = randomEnemy.img;
-            $elName.innerText = randomEnemy.name;
+            const elImg = document.getElementById('img-player2');
+            const elName = document.getElementById('name-player2');
+            elImg.src = randomEnemy.img;
+            elName.innerText = randomEnemy.name;
         }
 
         const renderButton = () => {
             player1.attacks.forEach(item => {
-                const $btn = document.createElement('button');
-                $btn.classList.add('button');
-                $btn.innerText = item.name;
-                const btnCount = countBtn(item.maxCount, $btn);
-                $btn.addEventListener('click', () => {
+                const btn = document.createElement('button');
+                btn.classList.add('button');
+                btn.innerText = item.name;
+                const btnCount = countBtn(item.maxCount, btn);
+                btn.addEventListener('click', () => {
                     btnCount();
                     player1.changeHP(random(item.minDamage, item.maxDamage), function(count) {
                         renderLog(player1, player2, count);
@@ -87,7 +87,7 @@ class Game {
                             renderLog(player2, player1, count);
                     });
                 })
-                allButtons.push($control.appendChild($btn));
+                allButtons.push(control.appendChild(btn));
             });
         };
 
@@ -123,18 +123,18 @@ class Game {
     }
 
     gameOver = () => {
-        const $btn = document.createElement('button');
-        const $control = document.querySelector('.control');
-        $control.innerHTML = ``;
-        $btn.classList.add('button');
-        $btn.innerText = `Game Over. Начать сначала?`;
-        $control.appendChild($btn).addEventListener('click', () => {
-            let $logs = document.querySelector('#logs');
-            let newLogs = $logs.querySelectorAll('p');
+        const btn = document.createElement('button');
+        const control = document.querySelector('.control');
+        control.innerHTML = ``;
+        btn.classList.add('button');
+        btn.innerText = `Game Over. Начать сначала?`;
+        control.appendChild(btn).addEventListener('click', () => {
+            let logs = document.querySelector('#logs');
+            let newLogs = logs.querySelectorAll('p');
             newLogs.forEach(item  => {
                 item.remove();
             })
-            $btn.remove();
+            btn.remove();
             this.start();
         });
     }
