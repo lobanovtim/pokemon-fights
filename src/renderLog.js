@@ -1,7 +1,7 @@
 import game from "./main.js";
 import random from "./utils.js";
 
-let $logs = document.querySelector('#logs');
+let logs = document.querySelector('#logs');
 
 const allButtons = document.querySelectorAll('.button')
 
@@ -18,20 +18,20 @@ const endGame = () => {
 
 const renderLog = (player1, player2, count) => {
     let log = generateLog(player1, player2, count);
-    const $p = document.createElement('p');
-    $p.innerText = `${log}`;  
-    $logs.insertBefore($p, $logs.children[0]);
+    const p = document.createElement('p');
+    p.innerText = `${log}`;  
+    logs.insertBefore(p, logs.children[0]);
     if (player1.hp.current <= 0) {
         player1.hp.current = 0;
-        $p.innerText = `Бедный ${player1.name} проиграл бой!`;
-        $logs.insertBefore($p, $logs.children[0]);
+        p.innerText = `Бедный ${player1.name} проиграл бой!`;
+        logs.insertBefore(p, logs.children[0]);
         endGame();
     }
     if (player1.hp.current <= 0 && player2.hp.current <= 0) {
         player1.hp.current = 0;
         player2.hp.current = 0;
-        $p.innerText = `Постоооойте...за секунду до смерти ${player2.name} из последних сил нанес мощный ответный удар! Ничья.`
-        $logs.insertBefore($p, $logs.children[0]);
+        p.innerText = `Постоооойте...за секунду до смерти ${player2.name} из последних сил нанес мощный ответный удар! Ничья.`
+        logs.insertBefore(p, logs.children[0]);
         endGame();
     }
 }
